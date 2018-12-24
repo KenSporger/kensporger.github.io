@@ -1,8 +1,10 @@
 const express = require("express");
+const bodyparser = require("body-parser");
 const app = express();
 const fs = require('fs');
 const mongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/mydb";
+const urlencodeparser = bodyparser.urlencoded({ extended: false });
 
 //读取静态页面
 var indexhtml = fs.readFileSync('./index.html').toString();
@@ -11,7 +13,7 @@ var resethtml = fs.readFileSync('./reset.html').toString();
 var usercenterhtml = fs.readFileSync('./usercenter.html').toString();
 var boardhtml = fs.readFileSync('./board.html').toString();
 
-app.use(express.static('./pictures'));
+app.use(express.static('./public'));
 
 //连接数据库
 mongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
@@ -22,10 +24,15 @@ mongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 })
 
 app.get('/', (req, res) => {
-    /*ipsearch(req.connection.remoteAddress).then((user) => {
+    ipsearch(req.connection.remoteAddress).then((user) => {
         if (user) res.send(usercenterhtml.replace("欢迎， user !", '欢迎, ' + req.query.username + ' !'));
-        elseres.send(indexhtml);
-    })*/
+        else res.send(indexhtml);
+    })
+})
+
+//退出登录
+app.get('/quit', (req, res) => {
+    ips.deleteOne({ ip: req.connection.remoteAddress });
     res.send(indexhtml);
 })
 
@@ -45,13 +52,13 @@ app.get('/board', (err, res) => {
 })
 
 //登录事件·
-app.get('/log', (req, res) => {
-    match(req.query).then((result) => {
+app.post('/log', urlencodeparser, (req, res) => {
+    match(req.body).then((result) => {
         if (!result) {
             res.send(logerr("账号或密码错误"));
         } else {
-            ipsetup(req.connection.remoteAddress, req.query.username).then((err) => {
-                res.send(usercenterhtml.replace("欢迎， user !", '欢迎, ' + req.query.username + ' !'));
+            ipsetup(req.connection.remoteAddress, req.body.username).then((err) => {
+                res.send(usercenterhtml.replace("欢迎， user !", '欢迎, ' + req.body.username + ' !'));
             }).catch((err) => {
                 res.send(logerr(err));
             })
@@ -60,13 +67,13 @@ app.get('/log', (req, res) => {
 })
 
 //注册事件
-app.get('/signup', (req, res) => {
+app.post('/signup', urlencodeparser, (req, res) => {
 
-    match(req.query, true).then((result) => {
+    match(req.body, true).then((result) => {
         if (result) throw "该用户名已被使用";
-        formate(req.query.password);
-        if (req.query.password != req.query.confirmpassword) throw "密码输入不一致";
-        identity.insertOne({ username: req.query.username, password: req.query.password });
+        formate(req.body.password);
+        if (req.body.password != req.body.confirmpassword) throw "密码输入不一致";
+        identity.insertOne({ username: req.body.username, password: req.body.password });
         res.send(indexhtml);
     }).catch((err) => {
         res.send(render(signuphtml, err));
@@ -74,25 +81,25 @@ app.get('/signup', (req, res) => {
 })
 
 //发表吐槽事件
-app.get('/boardcommit', (req, res) => {
+app.post('/boardcommit', urlencodeparser, (req, res) => {
 
 })
 
 //提交重置事件
-app.get('/commit_reset', (req, res) => {
+app.post('/commit_reset', urlencodeparser, (req, res) => {
     reset();
     async function reset() {
         let user = await ipsearch(req.connection.remoteAddress);
         let result = await match({ username: user.username }, true);
-        if (result.password != req.query.password)
+        if (result.password != req.body.password)
             res.send(resethtml.replace("<p>新密码：", '<p style="color:#cc0000">原始密码有误</p>' + "<p>新密码："));
         else {
             try {
-                formate(req.query.newpassword);
-                if (req.query.newpassword != req.query.confirmpassword) throw "密码输入不一致";
-                if (req.query.newpassword == result.password) throw "新密码不能与原密码相同";
-                identity.updateOne(result, { $set: { _id: result._id, username: result.username, password: req.query.newpassword } });
-                res.send(usercenterhtml.replace("欢迎， user !", '欢迎, ' + user + ' !'));
+                formate(req.body.newpassword);
+                if (req.body.newpassword != req.body.confirmpassword) throw "密码输入不一致";
+                if (req.body.newpassword == result.password) throw "新密码不能与原密码相同";
+                identity.updateOne(result, { $set: { _id: result._id, username: result.username, password: req.body.newpassword } });
+                res.send(usercenterhtml.replace("欢迎， user !", '欢迎, ' + user.username + ' !'));
             } catch (err) {
                 let replacement = '<input type="submit" name="log-in-button" value="确认修改">';
                 res.send(resethtml.replace(replacement, `<p style="color:#cc0000">${err}</p>` + replacement));
@@ -101,12 +108,6 @@ app.get('/commit_reset', (req, res) => {
     }
 })
 
-
-//退出登录事件
-app.get('/quit', (req, res) => {
-    ips.deleteOne({ ip: req.connection.remoteAddress });
-    res.send(indexhtml);
-})
 
 //查询数据库
 function match(mes, onlyName = false) {
@@ -145,8 +146,8 @@ function render(html, tip) {
 //检索用户是否已登录,若未登录则建立ip映射
 function ipsetup(ip, username) {
     return new Promise((resolve, reject) => {
-        ips.find({ $or: [{ username: username }, { ip: ip }] }).toArray((err, records) => {
-            if (records[0]) reject("重复登录！")
+        ips.find({ username: username }).toArray((err, records) => {
+            if (records[0]) reject("您的账号已在其他设备上登录！")
             else {
                 ips.insertOne({ ip: ip, username: username });
                 resolve();
@@ -164,7 +165,7 @@ function ipsearch(ip) {
 
 //登录错误处理
 function logerr(err) {
-    let replaced = '<input type="submit" name="log-in-button" value="登录 ">';
+    let replaced = '<input type="submit" name="log-in-button" id="log-in-button" value="进 入">';
     let replacement = `<p style="color:#cc0000">${err}</p>` + replaced; //登录错误
     return indexhtml.replace(replaced, replacement);
 }

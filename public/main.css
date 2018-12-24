@@ -1,0 +1,56 @@
+body {
+    background-image: url(index2.jpg);
+    background-attachment: scroll;
+    background-size: 100%;
+    color: black;
+}
+
+#logindiv {
+    background-color: whitesmoke;
+    height: 500px;
+    width: 380px;
+    margin-left: 70%;
+    margin-top: 10%;
+}
+
+#logindivinside {
+    padding-left: 13%;
+}
+
+#dengludiv {
+    padding-top: 9%;
+    padding-left: 31%;
+}
+
+#username {
+    width: 280px;
+    height: 35px;
+}
+
+#password {
+    width: 280px;
+    height: 35px;
+}
+
+#log-in-button {
+    margin-top: 10%;
+    width: 280px;
+    height: 35px;
+}
+
+#hrefdiv {
+    padding-top: 7%;
+    width: 280px;
+}
+
+#findbackdiv {
+    width: 140px;
+    float: left;
+    text-align: left;
+}
+
+#signindiv {
+    float: right;
+    width: 140px;
+    text-align: right;
+}
