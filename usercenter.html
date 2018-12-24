@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <style>
+        body {
+            text-align: center
+        }
+        
+        #head1 {
+            border: 3px solid yellowgreen;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="head1.jpg" height="100" width="100" name="head1" id="head1">
+    <h4>
+        欢迎， user !
+    </h4>
+    <form method="GET" action="http://192.168.0.118:8888/board">
+        <input type="submit" name="log-in-button" value="我要吐槽">
+    </form>
+    <br>
+    <form method="GET" action="http://192.168.0.118:8888/reset">
+        <input type="submit" name="log-in-button" value="重置密码">
+    </form>
+    <br>
+    <form method="GET" action="http://192.168.0.118:8888/quit">
+        <input type="submit" name="log-in-button" value="退出登录">
+    </form>
+</body>
+
+</html>

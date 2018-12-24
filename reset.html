@@ -3,16 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>注册系统</title>
+    <title>密码重设系统</title>
 </head>
 
 <body>
-    <form method="GET" action="http://192.168.0.118:8888/signup">
-        <p>用户名：
-            <input type="text" name="username" id="username" required="required">
-        </p>
-        <p>密码：
+    <form method="GET" action="http://192.168.0.118:8888/commit_reset">
+        <p>原始密码：
             <input type="password" name="password" id="password" required="required">
+        </p>
+        <p>新密码：
+            <input type="password" name="newpassword" id="newpassword" required="required">
         </p>
         <ul>
             <li>8~16个字符</li>
@@ -21,7 +21,7 @@
         <p>确认密码:
             <input type="password" name="confirmpassword" id="confirmpassword" required="required">
         </p>
-        <input type="submit" name="log-in-button" value="完成注册">
+        <input type="submit" name="log-in-button" value="确认修改">
     </form>
 </body>
 

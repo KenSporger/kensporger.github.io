@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>吐槽板</title>
+    <style>
+        body {
+            background-image: url("board.jpg");
+            background-attachment: scroll;
+            background-size: 2000px 1000px;
+        }
+        
+        #word {
+            margin: 0 auto;
+            border: 3px solid rgb(255, 161, 99);
+            width: 600px;
+            height: 360px;
+            resize: none;
+        }
+        
+        #wordCommit {
+            color: cornflowerblue;
+            font-size: 20px;
+            width: 100px;
+            height: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <blockquote>
+        <h1 style="text-align: center;font-size: 60px">吐槽板</h1>
+        <form style="text-align: center" method="GET" action="http://192.168.0.118:8888/boardcommit">
+            <textarea name="word" id="word" cols="80" rows="5" required="required" placeholder="写下此刻你的心情吧！"></textarea>
+            <br><input type="submit" name="wordCommit" id="wordCommit" value="发表">
+        </form>
+    </blockquote>
+</body>
+
+</html>
